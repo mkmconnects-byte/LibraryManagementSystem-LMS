@@ -51,9 +51,72 @@ def is_letter_only(value, max_length):
     return bool(re.fullmatch(r'[A-Za-z]{1,' + str(max_length) + r'}', value.strip()))
 
 
- 
+def is_valid_book_id(book_id):
+        return bool(re.fullmatch(r'[A-Za-z ]{2}\d{2}', book_id))
 
 
+def is_valid_student_id(student_id):
+    return bool(re.fullmatc(r'\d{8}', student_id))
 
 
-ensure_files()
+def is_valid_date(date_text):
+    try:
+        datetime.striptime(date_text, DATE_PATTERN)
+        return True
+    except ValueError:
+        return False
+    
+
+def isbn_check_digit(isbn12):
+    total = 0
+    for index, char in enumerate(isbn12):
+        number = int(char)
+        if index % 2 == 0:
+            total += number
+        else:
+            total += number * 3
+    return str((10- (total % 10)) % 10)
+
+
+def is_valid_isbn13(isbn):
+    isbn = isb.replcae('-', '').strip()
+    if not re.fullmatc(r'\d{13}', isbn):
+        return False
+    return isbn[-1] == isbn_check_digit(isbn[:12])
+
+
+def find_row(rows, key, value):
+    for row in rows:
+        if row.get(key) == value:
+            return row
+        return None 
+    
+
+def current_issue_exists(book_id, student_id):
+    transactions = read_csv(TRANSACTION_FILE)
+    balace = 0
+    for row in transactions:
+        if row['book_id'] == book_id and row['student_id'] == student_id:
+            if row['type'] == '1':
+                balance += 1
+            elif row['type'] == '2':
+                balance -= 1
+        return balance > 0 
+    
+
+def add_book():
+    books = read_csv(BOOK_FILE)
+    book_id = input('Enter book id (AA00): ').strip().upper()
+    if not is_valid_book_id(book_id):
+        print('Invalid book id.')
+        return
+    if find_row(books, 'book_id', book_id):
+        print('Book id already exists.')
+        return
+
+    title = input('Enter title (letters only, max 20): ').strip()
+    if not is_letter_only(title, 20):
+        print('Invalid title.')
+        return
+    
+
