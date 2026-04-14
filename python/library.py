@@ -151,7 +151,15 @@ def add_book():
     print('Book added successfully.')
 
 
-
+def view_books():
+    books = read_csv(BOOK_FILE)
+    if not books:
+        print('No books found.')
+        return
+    print('\nBooks')
+    print('-' * 80)
+    for row in books:
+        print(f"{row['book_id']} | {row['title']} | ISBN {row['isbn13']} | Copies {row['copies']} | Available {row['availability']} | Price {row['price']}")
 
     
 
