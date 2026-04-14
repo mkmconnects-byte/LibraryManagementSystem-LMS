@@ -132,8 +132,27 @@ def add_book():
         return
     copies = int(copies_text)
 
-
+    price_text = input('Enter price (two decimals): ').strip()
+    if not re.fullmatch(r'\d+(\.\d{2})', price_text):
+        print('Invalid price format.')
+        return
     
+    new_row = {
+        'book_id': book_id,
+        'title':title,
+        'isbn13': isbn13,
+        'author': author,
+        'copies': str(copies),
+        'availability': str(copies),
+        'price': price_text,
+    }
+    books.append(new_row)
+    write_csv(BOOK_FILE, books, ['book_id', 'title', 'isbn13','author', 'copies', 'availability', 'price'])
+    print('Book added successfully.')
+
+
+
+
     
 
 
