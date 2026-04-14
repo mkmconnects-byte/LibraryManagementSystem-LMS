@@ -119,4 +119,23 @@ def add_book():
         print('Invalid title.')
         return
     
+    isbn13= input('Eneter ISBN-13: ').strip()
+    if not is_letter_only(title, 20):
+        print('InvalidISBN-13. ')
+        return
+    
+    author = input('Enter author: ').strip()
+
+    copies_text = input('Enter copies (0-2): ').strip()
+    if not copies_text.isdigit() or int(copies_text) > 2:
+        print('Invalid copies count.')
+        return
+    copies = int(copies_text)
+
+
+    
+    
+
+
+    
 
