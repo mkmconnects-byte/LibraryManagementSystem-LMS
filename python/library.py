@@ -58,8 +58,7 @@ def append_csv(path, row, fieldnames):
 
 # function to validate input 
 def is_letter_only(value, max_length):
-    return bool(re.fullmatch(r'[A-Za-z]{1,' + str(max_length) + r'}', value.strip()))
-
+    return bool(re.fullmatch(r'[A-Za-z ]{1,' + str(max_length) + r'}', value.strip()))
 
 def is_valid_book_id(book_id):
         return bool(re.fullmatch(r'[A-Za-z ]{2}\d{2}', book_id))
@@ -89,7 +88,7 @@ def isbn_check_digit(isbn12):
 
 
 def is_valid_isbn13(isbn):
-    isbn = isbn.replcae('-', '').strip()
+    isbn = isbn.replace('-', '').strip()
     if not re.fullmatc(r'\d{13}', isbn):
         return False
     return isbn[-1] == isbn_check_digit(isbn[:12])
@@ -186,7 +185,7 @@ def add_book():
     print('Book added successfully.')
 
 
-def view_book():
+def view_books():
     books = read_csv(BOOK_FILE)
     if not books:
         print('No books found.')
@@ -197,7 +196,7 @@ def view_book():
         print(f"{row['book_id']} | {row['title']} | ISBN {row['isbn13']} | author {row['author']} | Copies {row['copies']} | Available {row['availability']} | Price {row['price'] }")
 
 
-def search_book():
+def search_books():
     books = read_csv(BOOK_FILE)
 
     while True:
@@ -246,7 +245,7 @@ def edit_book():
         new_author = input(f"New author [{book['author']}]: ").strip()
 
         if not new_author:
-            print('Author cannot be empty')
+            break
         elif not is_letter_only(new_author, 20):
             print('Invalid author.')
 
@@ -255,4 +254,108 @@ def edit_book():
             break
 
 
+    while True:
+        new_price= input(f"New price [{book['price']}]: ").strip()
+
+        if not new_price:
+            break
+        if not re.fullmatch(r'\d+(\.\d{2})', new_price):
+            print('Invalid price')
+        else:
+            book['price'] = new_price
+            break
         
+        
+    while True:
+        new_copies = input(f"New copies [{book['copies']}]: ").strip()
+
+        if not new_copies:
+            break
+
+        if not new_copies.isdigit() or int(new_copies) > 2:
+            print('Invalid copies count')
+        else:
+            copies = int(new_copies)
+            issued_count = int(book['copies']) - int(book['availabilty'])
+
+            if copies < issued_count:
+                print('Copies cannot be less than currently issued count.')
+            else:
+                book['copies'] = str(copies)
+                book['availabilty'] = str(copies - issued_count)
+                break
+
+
+    write_csv(BOOK_FILE, books, ['book_id', 'title', 'isbn13', 'author' , 'copies', 'availability', 'price'])
+    print('Book updated successfully.')
+
+
+def add_student():
+    students = read_csv(STUDENT_FILE)
+
+    while True:
+        student_id = input('Enter student id (8 digits): ').strip()
+
+        if not is_valid_student_id(student_id):
+            print('Invalid student id.')
+        elif find_row(students, 'student_id', student_id):
+            print('student id already exists')
+        else:
+            break
+
+    while True:
+            
+            first_name = input('Enter first name (letters only, max 10): ').strip()
+
+            if not is_letter_only(first_name, 10):
+                print('Invalid first name.')
+            else:
+                break
+
+    students.append({'student_id': student_id, 'first_name': first_name})
+    write_csv(STUDENT_FILE, students, ['student_id', 'first_name'])
+    print('Student added successfully')
+        
+
+def main_menu():
+    ensure_files()
+    while True:
+        print('\nLibrary Management System - Python CLI')
+        print('1. Add book')
+        print('2. Edit book')
+        print('3. Search books')
+        print('4. View books')
+        print('5. Add student')
+        print('6. Issue book')
+        print('7. Return book')
+        print('8. Trend graph')
+        print('9. Exit')
+        choice = input('Enter choice: ').strip()
+
+
+
+        if choice == '1':
+            add_book()
+        elif choice == '2':
+            edit_book()
+        elif choice == '3':
+            search_books()
+        elif choice == '4':
+            view_books()
+        elif choice == '5':
+            add_student()
+        elif choice == '6':
+            issue_book()
+        elif choice == '7':
+            return_book()
+        elif choice == '8':
+            trend_graph()
+        elif choice == '9':
+            print('Goodbye.')
+            break
+        else:
+            print('Invalid menu choice.')
+
+
+if __name__ == '__main__':
+    main_menu()
