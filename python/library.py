@@ -134,4 +134,47 @@ def add_book():
         print('Invalid ISBN-13')
         return
     
+    author = input('Enter author: ').strip()
+
+    copies_text = input('Enter copies (0-2): ').strip()
+    if not copies_text.isdigit() or int(copies_text) > 2:
+        print('Invalid copies count.')
+        return
+    copies =int(copies_text)
+
+# the second line tells the price_text format
+#\d = digit(0-9) and + means one r more
+#\. means decimals point and\d{2} means exactly 2 digits
+
+
+    price_text = input('Enter price (two decimals): ').strip()
+    if not re.fullmatch(r'\d+(\.\d{2})', price_text):
+        print('Invalid price format.')
+        return
     
+
+    new_row = {
+        'book_id':book_id,
+        'title': title,
+        'isbn13': isbn13,
+        'author': author,
+        'copies': str(copies),
+        'availability': str(copies),
+        'price': price_text,
+    }
+    books.append(new_row)
+    write_csv(BOOK_FILE, books, ['book_id', 'title', 'isbn13', 'author', 'copies', 'availability', 'price'])
+    print('Book added successfully,.')
+
+
+def view_book():
+    books = read_csv(BOOK_FILE)
+    if not books:
+        print('No books found.')
+        return
+    print('\nBooks')  # breaking the line when booksis typed.
+    print('-' * 80)  # nothing fancy just adding a line with 80 "-".
+    for row in books:
+        print(f"{row['book_id']} | {row['title']} | ISBN {row['isbn13']} | author {row['author']} | Copies {row['copies']} | Available {row['availability']} | Price {row['price'] }")
+
+
