@@ -324,19 +324,39 @@ def issue_book():
 def main_menu():
     ensure_files()
     while True:
-        print('\nLibrary Management System - Python CLI')
-        print('1. Add book')
-        print('2. Edit book')
-        print('3. Search books')
-        print('4. View books')
-        print('5. Add student')
-        print('6. Issue book')
-        print('7. Return book')
-        print('8. Trend graph')
-        print('9. Exit')
-        choice = input('Enter choice: ').strip()
+        # Optional: clear screen for clean UI
+        os.system('cls' if os.name == 'nt' else 'clear')
 
+        print('\nLibrary Management System - Python CLI\n')
 
+        menu = [
+            "1. Add book",
+            "2. Edit book",
+            "3. Search books",
+            "4. View books",
+            "5. Add student",
+            "6. Issue book",
+            "7. Return book",
+            "8. Trend graph",
+            "9. Exit"
+        ]
+
+        logo = [
+            " _       __  __   _____",
+            "| |     |  \\/  | / ____|",
+            "| |     | \\  / || (___",
+            "| |     | |\\/| | \\___ \\",
+            "| |____ | |  | | ____) |",
+            "|______||_|  |_||_____/",
+            "",
+            "",
+            ""
+        ]
+
+        for i in range(len(menu)):
+            print(f"{menu[i]:<35} {logo[i]}")
+
+        choice = input('\nEnter choice: ').strip()
 
         if choice == '1':
             add_book()
