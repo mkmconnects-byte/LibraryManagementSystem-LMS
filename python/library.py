@@ -318,8 +318,139 @@ def add_student():
 
 
 def issue_book():
-    bookd = read_csv(BOOK_FILE)
-        
+    books = read_csv(BOOK_FILE)
+    students = read_csv(STUDENT_FILE)
+
+    while True:
+        book_id = input('Enter book id: ').strip().upper()
+        book = find_row(books, 'book_id', book_id)
+
+        if not book:
+            print('Invalid book id.')
+        else:
+            break
+
+    while True:
+        student_id = input('Enter student id:').strip()
+        student = find_row(students, 'student_id', student_id)
+
+        if not student:
+            print('Invalid student id')
+        else:
+            break
+
+    while True:
+            return_date = input('Enter return date (DD/MM/YYYY):').strip()
+
+            if not is_valid_date(return_date):
+                print("Invalid date.")
+            else:
+                break
+
+    if not current_issue_exists(book_id,student_id):
+        print('Book already returned.')
+        return
+    
+    new_availability = int(book['availability']) + 1
+    
+    if new_availability > int(book['availability']):
+        print('Availability cannot exceed copies.')
+        return
+    
+    book['availability'] = str(new_availability)
+
+    write_csv(
+        BOOK_FILE,
+        books,
+        ['book_id', 'time', 'isbn13', 'author', 'copies', 'availability', 'price']
+    )
+
+    append_csv(
+        TRANSACTION_FILE,
+        {
+            'date': return_date,
+            'book_id': book_id,
+            'student_id': student_id,
+            'type': '2'
+        },
+        ['date', 'book_id', 'student_id', 'type']
+    )
+
+    print('Book returned successfully.')
+
+
+def return_book():
+    books = read_csv(BOOK_FILE)
+    students = read_csv(STUDENT_FILE)
+
+    while True:
+        book_id  = input('Enter book id: ').strip().upper()
+        book = find_row(books, 'book_id', book_id)
+
+        if not book:
+            print('Invalid book id.')
+        else:
+            break
+
+    while True:
+        student_id = input('Enter student id: ').strip()
+        student = find_row(students, 'student_id', student_id)
+
+        if not student:
+            print('Invalid student id.')
+        else:
+            break
+
+    if not current_issue_exists(book_id, student_id):
+        print('Book already returned.')
+        return
+    
+    new_availability = int(book['availability']) + 1
+
+    if new_availability > int(book['copies']):
+        print('Availability cannot exceed copies.')
+        return
+    
+    book['availability'] = str(new_availability)
+
+    write_csv(
+        BOOK_FILE,
+        books,
+        ['book_id', 'title', 'isbn13', 'author', 'copies', 'availability', 'price']
+    )
+
+    append_csv(
+        TRANSACTION_FILE,
+        {
+            'date': return_date,
+            'book_id': book_id,
+            'student_id': student_id,
+            'type': '2'
+        },
+        ['date', 'book_id', 'student_id', 'type']
+    )
+
+    print('Book returned successfully.')
+
+
+def trend_graph():
+    try:
+        import pandas as pd
+        import plotly.express as px
+    except ImportError:
+        print('Install pandas and plotly first.')
+        return
+
+    rows = read_csv(TRANSACTION_FILE)
+    issue_rows = [row for row in rows if row['type'] == '1']
+    if not issue_rows:
+        print('No issue transactions found.')
+        return
+    counts = Counter(row['date'] for row in issue_rows)
+    df = pd.DataFrame(sorted(counts.items()), columns=['date', 'issued_books'])
+    fig = px.line(df, x='date', y='issued_books', title='Books Issued Trend by Date', markers=True)
+    fig.show()
+    
 
 def main_menu():
     ensure_files()
