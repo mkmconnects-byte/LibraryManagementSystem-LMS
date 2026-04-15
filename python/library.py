@@ -7,7 +7,7 @@ from datetime import datetime
 BOOK_FILE = "data/book.csv"
 STUDENT_FILE = "data/student.csv"
 TRANSACTION_FILE = "data/transaction.csv"
-DATE_PATTERN = '%d/%m%Y'
+DATE_PATTERN = '%d/%m/%Y'
 
 
 def ensure_files():
@@ -61,16 +61,15 @@ def is_letter_only(value, max_length):
     return bool(re.fullmatch(r'[A-Za-z ]{1,' + str(max_length) + r'}', value.strip()))
 
 def is_valid_book_id(book_id):
-        return bool(re.fullmatch(r'[A-Za-z ]{2}\d{2}', book_id))
-
+    return re.fullmatch(r'[A-Za-z]{2}\d{2}', book_id)
 
 def is_valid_student_id(student_id):
-    return bool(re.fullmatc(r'\d{8}', student_id))
+    return bool(re.fullmatch(r'\d{8}', student_id))
 
 
 def is_valid_date(date_text):
     try:
-        datetime.striptime(date_text, DATE_PATTERN)
+        datetime.strptime(date_text, DATE_PATTERN)
         return True
     except ValueError:
         return False
@@ -89,7 +88,7 @@ def isbn_check_digit(isbn12):
 
 def is_valid_isbn13(isbn):
     isbn = isbn.replace('-', '').strip()
-    if not re.fullmatc(r'\d{13}', isbn):
+    if not re.fullmatch(r'\d{13}', isbn):
         return False
     return isbn[-1] == isbn_check_digit(isbn[:12])
 
@@ -98,7 +97,7 @@ def find_row(rows, key, value):
     for row in rows:
         if row.get(key) == value:
             return row
-        return None 
+    return None
     
 
 def current_issue_exists(book_id, student_id):
@@ -273,16 +272,16 @@ def edit_book():
             break
 
         if not new_copies.isdigit() or int(new_copies) > 2:
-            print('Invalid copies count')
+            print('Invalid copies count.')
         else:
             copies = int(new_copies)
-            issued_count = int(book['copies']) - int(book['availabilty'])
+            issued_count = int(book['copies']) - int(book['availability'])
 
             if copies < issued_count:
                 print('Copies cannot be less than currently issued count.')
             else:
                 book['copies'] = str(copies)
-                book['availabilty'] = str(copies - issued_count)
+                book['availability'] = str(copies - issued_count)
                 break
 
 
@@ -315,6 +314,11 @@ def add_student():
     students.append({'student_id': student_id, 'first_name': first_name})
     write_csv(STUDENT_FILE, students, ['student_id', 'first_name'])
     print('Student added successfully')
+
+
+
+def issue_book():
+    bookd = read_csv(BOOK_FILE)
         
 
 def main_menu():
@@ -351,7 +355,7 @@ def main_menu():
         elif choice == '8':
             trend_graph()
         elif choice == '9':
-            print('Goodbye.')
+            print('Goodbye, See you again.')
             break
         else:
             print('Invalid menu choice.')

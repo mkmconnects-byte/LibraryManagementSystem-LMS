@@ -1,1 +1,2 @@
-book_id,title,isbn13,author,availability,price
+book_id,title,isbn13,author,copies,availability,price
+AA01,Game Of Thrones,978-3-16-148410-0,George Martin,0,0,100.23
