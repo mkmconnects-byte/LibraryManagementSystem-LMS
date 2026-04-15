@@ -115,46 +115,61 @@ def current_issue_exists(book_id, student_id):
     
 
 def add_book():
-    books= read_csv(BOOK_FILE)
-    book_id = input('Enter book id(AA00): ').strip().upper()
-    if not is_valid_book_id(book_id):
-        print('Invalid book id.')
-        return
-    if find_row(books, 'book_id', book_id):
-        print('Book id already exists.')
-        return
-    
-    title = input('NEnter title (lettersoly, max 20): ').strip()
-    if not is_letter_only(title, 20):
-        print('Invalid title.')
-        return
-    
-    isbn13 = input('Enter ISBN-13: ').strip()
-    if not is_valid_isbn13(isbn13):
-        print('Invalid ISBN-13')
-        return
-    
-    author = input('Enter author: ').strip()
+    books = read_csv(BOOK_FILE)
 
-    copies_text = input('Enter copies (0-2): ').strip()
-    if not copies_text.isdigit() or int(copies_text) > 2:
-        print('Invalid copies count.')
-        return
-    copies =int(copies_text)
+    # BOOK ID
+    while True:
+        book_id = input('Enter book id (AA00): ').strip().upper()
+        if not is_valid_book_id(book_id):
+            print('Invalid book id.')
+        elif find_row(books, 'book_id', book_id):
+            print('Book id already exists.')
+        else:
+            break
 
-# the second line tells the price_text format
-#\d = digit(0-9) and + means one r more
-#\. means decimals point and\d{2} means exactly 2 digits
+    # TITLE
+    while True:
+        title = input('Enter title (letters only, max 20): ').strip()
+        if not is_letter_only(title, 20):
+            print('Invalid title.')
+        else:
+            break
 
+    # ISBN
+    while True:
+        isbn13 = input('Enter ISBN-13: ').strip()
+        if not is_valid_isbn13(isbn13):
+            print('Invalid ISBN-13.')
+        else:
+            break
 
-    price_text = input('Enter price (two decimals): ').strip()
-    if not re.fullmatch(r'\d+(\.\d{2})', price_text):
-        print('Invalid price format.')
-        return
-    
+    # AUTHOR
+    while True:
+        author = input('Enter author (letters only, max 20): ').strip()
+        if not is_letter_only(author, 20):
+            print('Invalid author.')
+        else:
+            break
+
+    # COPIES
+    while True:
+        copies_text = input('Enter copies (0-2): ').strip()
+        if not copies_text.isdigit() or not (0 <= int(copies_text) <= 2):
+            print('Invalid copies count.')
+        else:
+            copies = int(copies_text)
+            break
+
+    # PRICE
+    while True:
+        price_text = input('Enter price (two decimals): ').strip()
+        if not re.fullmatch(r'\d+(\.\d{2})', price_text):
+            print('Invalid price format.')
+        else:
+            break
 
     new_row = {
-        'book_id':book_id,
+        'book_id': book_id,
         'title': title,
         'isbn13': isbn13,
         'author': author,
@@ -162,9 +177,15 @@ def add_book():
         'availability': str(copies),
         'price': price_text,
     }
+
     books.append(new_row)
-    write_csv(BOOK_FILE, books, ['book_id', 'title', 'isbn13', 'author', 'copies', 'availability', 'price'])
-    print('Book added successfully,.')
+    write_csv(
+        BOOK_FILE,
+        books,
+        ['book_id', 'title', 'isbn13', 'author', 'copies', 'availability', 'price']
+    )
+
+    print('Book added successfully.')
 
 
 def view_book():
@@ -178,3 +199,34 @@ def view_book():
         print(f"{row['book_id']} | {row['title']} | ISBN {row['isbn13']} | author {row['author']} | Copies {row['copies']} | Available {row['availability']} | Price {row['price'] }")
 
 
+def search_book():
+    keyword = input('Enter the keyword').strip().lower()
+    books = read_csv(BOOK_FILE)
+    matches = [row for row in books if keyword in row['title'].lower()]
+    if not matches:
+        print('No matching books found.')
+        return
+    for row in matches:
+        print(f"{row['book_id']} | {row['title']} | Available {row['availability']}")
+
+
+def edit_book():
+    books = read_csv(BOOK_FILE)
+    book_id = input('Enter books id to edit: ').strip().upper()
+    book = find_row(books, 'book_id', book_id)
+    if not book:
+        print('Invalid bookid. ')
+        return 
+    
+    new_title = input(f"Newtitle [{book['title']}]: ").strip()
+    if new_title:
+        if not is_letter_only(new_title, 20):
+            print('Invalid title.')
+            return
+        book['title'] = new_title 
+
+    new_author = input(f"New author [{book['author']}]: ").strip()
+    if new_author:
+        book['author'] = new_author
+
+    
