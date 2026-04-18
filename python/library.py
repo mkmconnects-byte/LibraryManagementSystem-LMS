@@ -157,6 +157,8 @@ def add_book():
 # the second line tells the price_text format
 #\d = digit(0-9) and + means one r more
 #\. means decimals point and\d{2} means exactly 2 digits
+
+
     while True:
         price_text = input('Enter price (two decimals): ').strip()
         if not re.fullmatch(r'\d+(\.\d{2})', price_text):
@@ -484,6 +486,7 @@ def main_menu():
             ""
         ]
 
+
         for i in range(len(menu)):
             print(f"{menu[i]:<35} {logo[i]}")
 
@@ -510,6 +513,7 @@ def main_menu():
             break
         else:
             print('Invalid menu choice.')
+
 
 
 if __name__ == '__main__':
