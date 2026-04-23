@@ -6,7 +6,7 @@ from datetime import datetime
 
 BOOK_FILE = "data/book.csv"
 STUDENT_FILE = "data/student.csv"
-TRANSACTION_FILE = "data/transaction.csv"
+TRANSACTION_FILE = "data/transactions.csv"
 DATE_PATTERN = '%d/%m/%Y'
 
 
@@ -326,59 +326,54 @@ def issue_book():
     while True:
         book_id = input('Enter book id: ').strip().upper()
         book = find_row(books, 'book_id', book_id)
-
         if not book:
             print('Invalid book id.')
         else:
             break
 
     while True:
-        student_id = input('Enter student id:').strip()
+        student_id = input('Enter student id: ').strip()
         student = find_row(students, 'student_id', student_id)
-
         if not student:
-            print('Invalid student id')
+            print('Invalid student id.')
         else:
             break
 
     while True:
-            return_date = input('Enter return date (DD/MM/YYYY):').strip()
+        issue_date = input('Enter issue date (DD/MM/YYYY): ').strip()
+        if not is_valid_date(issue_date):
+            print('Invalid date.')
+        else:
+            break
 
-            if not is_valid_date(return_date):
-                print("Invalid date.")
-            else:
-                break
+    if int(book['availability']) <= 0:
+        print('No available copies.')
+        return
 
-    if not current_issue_exists(book_id,student_id):
-        print('Book already returned.')
+    if current_issue_exists(book_id, student_id):
+        print('Book already issued.')
         return
-    
-    new_availability = int(book['availability']) + 1
-    
-    if new_availability > int(book['availability']):
-        print('Availability cannot exceed copies.')
-        return
-    
-    book['availability'] = str(new_availability)
+
+    book['availability'] = str(int(book['availability']) - 1)
 
     write_csv(
         BOOK_FILE,
         books,
-        ['book_id', 'time', 'isbn13', 'author', 'copies', 'availability', 'price']
+        ['book_id', 'title', 'isbn13', 'author', 'copies', 'availability', 'price']
     )
 
     append_csv(
         TRANSACTION_FILE,
         {
-            'date': return_date,
+            'date': issue_date,
             'book_id': book_id,
             'student_id': student_id,
-            'type': '2'
+            'type': '1'
         },
         ['date', 'book_id', 'student_id', 'type']
     )
 
-    print('Book returned successfully.')
+    print('Book issued successfully.')
 
 
 def return_book():
@@ -458,7 +453,7 @@ def main_menu():
     ensure_files()
     while True:
         # Optional: clear screen for clean UI
-        os.system('cls' if os.name == 'nt' else 'clear')
+        
 
         print('\nLibrary Management System - Python CLI\n')
 
