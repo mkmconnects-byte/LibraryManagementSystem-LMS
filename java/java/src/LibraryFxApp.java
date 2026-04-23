@@ -130,4 +130,41 @@ public class LibraryFxApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    public ArrayList<Book> loadBooks() {
+        ArrayList<Book> books = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("../data/book.csv"));
+            String line;
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts.length != 7) continue;
+
+                String id = parts[0];
+                String title = parts[1];
+                String isbn = parts[2].replace("-", "").trim();
+                String author = parts[3];
+                int copies = Integer.parseInt(parts[4]);
+                int available = Integer.parseInt(parts[5]);
+                double price = Double.parseDouble(parts[6]);
+
+                if (!Validator.validBookId(id)) continue;
+                if (!Validator.validIsbn13(isbn)) continue;
+                if (!Validator.validCopies(copies)) continue;
+                if (!Validator.validAvailability(available, copies)) continue;
+
+                books.add(new Book(id, title, isbn, author, copies, available, price));
+            }
+
+            br.close();
+        } catch (Exception e) {
+            outputArea.setText("Error loading books.\n" + e.getMessage());
+        }
+
+        return books;
+    }
 }
