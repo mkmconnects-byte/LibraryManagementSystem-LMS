@@ -2,8 +2,13 @@ public class Student {
     public String id;
     public String name;
 
-    public Student(String id, String name){
+    public Student(String id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student ID: " + id + ", Name: " + name;
     }
 }
