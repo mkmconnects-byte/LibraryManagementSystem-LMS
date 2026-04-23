@@ -61,7 +61,7 @@ def is_letter_only(value, max_length):
     return bool(re.fullmatch(r'[A-Za-z ]{1,' + str(max_length) + r'}', value.strip()))
 
 def is_valid_book_id(book_id):
-    return re.fullmatch(r'[A-Za-z]{2}\d{2}', book_id)
+    return bool(re.fullmatch(r'[A-Za-z]{2}\d{2}', book_id))
 
 def is_valid_student_id(student_id):
     return bool(re.fullmatch(r'\d{8}', student_id))
@@ -109,7 +109,7 @@ def current_issue_exists(book_id, student_id):
                 balance += 1
             elif row['type'] == '2':
                 balance -= 1
-        return balance > 0 
+    return balance > 0 
     
 
 def add_book():
@@ -395,6 +395,13 @@ def return_book():
 
         if not student:
             print('Invalid student id.')
+        else:
+            break
+
+    while True:
+        return_date = input('Enter return date (DD/MM/YYYY): ').strip()
+        if not is_valid_date(return_date):
+            print('Invalid date.')
         else:
             break
 

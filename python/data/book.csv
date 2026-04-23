@@ -1,4 +1,9 @@
 book_id,title,isbn13,author,copies,availability,price
 AA01,Game Of Thrones,978-3-16-148410-0,George Martin,0,0,100.23
-AA02,Breaking Bad,978-0-306-40615-7,Madhushan,2,2,783.65
+AA02,Breaking Bad,978-0-306-40615-7,Madhushan,2,1,783.65
 AA03,Breaking Bad,978-3-16-148410-0,Keshara,2,2,54.21
+AA04,The Hobbit,978-0-547-92822-8,J.R.R. Tolkien,3,2,45.99
+AA05,Harry Potter and the Sorcerer's Stone,978-0-439-13959-0,J.K. Rowling,5,1,22.50
+AA06,To Kill a Mockingbird,978-0-06-112008-4,Harper Lee,1,1,18.99
+AA07,The Great Gatsby,978-0-7432-7356-5,F. Scott Fitzgerald,2,2,15.75
+AA08,1984,978-0-452-28423-4,George Orwell,4,1,32.45
