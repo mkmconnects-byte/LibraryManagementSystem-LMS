@@ -167,4 +167,32 @@ public class LibraryFxApp extends Application {
 
         return books;
     }
+    public ArrayList<Student> loadStudents() {
+        ArrayList<Student> students = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("../data/student.csv"));
+            String line;
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts.length != 2) continue;
+
+                String id = parts[0];
+                String name = parts[1];
+
+                if (!Validator.validStudentId(id)) continue;
+
+                students.add(new Student(id, name));
+            }
+
+            br.close();
+        } catch (Exception e) {
+            outputArea.setText("Error loading students.\n" + e.getMessage());
+        }
+
+        return students;
+    }
 }
