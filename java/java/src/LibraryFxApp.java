@@ -195,4 +195,26 @@ public class LibraryFxApp extends Application {
 
         return students;
     }
+
+    public void exportSearchResults(ArrayList<String> results) {
+        try {
+            PrintWriter writer = new PrintWriter(new FileWriter("../data/search_results.txt"));
+            for (String line : results) {
+                writer.println(line);
+            }
+            writer.close();
+            outputArea.appendText("\nSearch results exported to data/search_results.txt\n");
+        } catch (Exception e) {
+            outputArea.appendText("\nError exporting search results.\n");
+        }
+    }
+
+    public Book findBookById(String id) {
+        for (Book book : books) {
+            if (book.id.equalsIgnoreCase(id)) {
+                return book;
+            }
+        }
+        return null;
+    }
 }
