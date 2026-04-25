@@ -104,9 +104,13 @@ public class LibraryFxApp extends Application {
         bottomBar.getStyleClass().add("bottom-bar");
 
         ImageView imageView = new ImageView(new Image("file:book.jpg"));
-        imageView.setFitWidth(250);
-        imageView.setFitHeight(250);
+        imageView.setFitWidth(260);
+        imageView.setFitHeight(260);
         imageView.setPreserveRatio(true);
+        imageView.setStyle(
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.3, 0, 5);" +
+                "-fx-background-radius: 20;"
+        );
 
         Label centerTitle = new Label("Library Management System");
         centerTitle.getStyleClass().add("main-title");
@@ -135,7 +139,7 @@ public class LibraryFxApp extends Application {
         ArrayList<Book> books = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("../data/book.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("../../data/book.csv"));
             String line;
             br.readLine();
 
@@ -172,7 +176,7 @@ public class LibraryFxApp extends Application {
         ArrayList<Student> students = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("../data/student.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("../../data/student.csv"));
             String line;
             br.readLine();
 
@@ -201,7 +205,7 @@ public class LibraryFxApp extends Application {
         ArrayList<Transaction> transactions = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("../data/transactions.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("../../data/transactions.csv"));
             String line;
             br.readLine();
 

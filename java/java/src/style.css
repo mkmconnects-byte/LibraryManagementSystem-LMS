@@ -1,48 +1,87 @@
 .root {
     -fx-font-family: "Segoe UI";
-    -fx-background-color: linear-gradient(to bottom, #111827, #1f2937);
+    -fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);
     -fx-padding: 20;
 }
 
+/* ===== GLASS PANELS ===== */
 .top-bar, .bottom-bar {
     -fx-padding: 15;
-    -fx-background-color: rgba(255,255,255,0.05);
-    -fx-background-radius: 15;
-    -fx-border-color: rgba(255,255,255,0.08);
-    -fx-border-radius: 15;
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.2, 0, 5);
 }
 
+/* ===== BUTTONS ===== */
 .button {
-    -fx-background-color: #2563eb;
+    -fx-background-color: linear-gradient(to right, #2563eb, #3b82f6);
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 12;
     -fx-padding: 10 18 10 18;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.3, 0, 3);
 }
 
+/* Hover animation */
 .button:hover {
-    -fx-background-color: #3b82f6;
+    -fx-background-color: linear-gradient(to right, #3b82f6, #60a5fa);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
+/* Click effect */
+.button:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* ===== TITLE ===== */
 .main-title {
-    -fx-text-fill: white;
-    -fx-font-size: 28px;
+    -fx-text-fill: linear-gradient(to right, #e2e8f0, #93c5fd);
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 8, 0.3, 0, 2);
 }
 
+/* ===== TEXT AREA ===== */
 .text-area {
     -fx-font-size: 13px;
     -fx-text-fill: #e5e7eb;
-    -fx-control-inner-background: #0f172a;
-    -fx-background-color: #0f172a;
+    -fx-control-inner-background: #020617;
+    -fx-background-color: #020617;
     -fx-border-color: #334155;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 10;
 }
 
+/* Inner content */
 .text-area .content {
-    -fx-background-color: #0f172a;
-    -fx-background-radius: 12;
+    -fx-background-color: #020617;
+    -fx-background-radius: 14;
 }
+
+/* Focus glow */
+.text-area:focused {
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.5), 10, 0.3, 0, 0);
+}
+
+/* Scrollbar styling */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #475569;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #64748b;
+}
+
