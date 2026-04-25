@@ -86,7 +86,7 @@ public class LibraryFxApp extends Application {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Search Book");
             dialog.setHeaderText("Enter title or prefix");
-            dialog.setContentText("Title or prefix*: ");
+            dialog.setContentText("Title or prefix: ");
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(this::showSearchResults);
