@@ -196,6 +196,115 @@ public class LibraryFxApp extends Application {
         return students;
     }
 
+    public ArrayList<Transaction> loadTransactions() {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("../data/transactions.csv"));
+            String line;
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts.length != 4) continue;
+
+                String date = parts[0];
+                String bookId = parts[1];
+                String studentId = parts[2];
+                int type = Integer.parseInt(parts[3]);
+
+                if (!Validator.validDate(date)) continue;
+                if (!Validator.validBookId(bookId)) continue;
+                if (!Validator.validStudentId(studentId)) continue;
+                if (!Validator.validTransactionType(type)) continue;
+
+                transactions.add(new Transaction(date, bookId, studentId, type));
+            }
+
+            br.close();
+        } catch (Exception e) {
+            outputArea.setText("Error loading transactions.\n" + e.getMessage());
+        }
+
+        return transactions;
+    }
+
+    public void showBooksIssuedReport(String date) {
+        outputArea.setText("BOOKS ISSUED REPORT FOR " + date + "\n\n");
+
+        boolean found = false;
+
+        for (Transaction transaction : transactions) {
+            if (transaction.date.equals(date) && transaction.type == 1) {
+                Book book = findBookById(transaction.bookId);
+                found = true;
+
+                if (book != null) {
+                    outputArea.appendText("Book ID: " + book.id + ", Title: " + book.title + "\n");
+                } else {
+                    outputArea.appendText("Book ID: " + transaction.bookId + ", Title not found\n");
+                }
+            }
+        }
+
+        if (!found) {
+            outputArea.appendText("No issued books found for this date.\n");
+        }
+    }
+
+    public void showAverageBookPrice() {
+        outputArea.setText("AVERAGE BOOK PRICE\n\n");
+
+        if (books.size() == 0) {
+            outputArea.appendText("No books available.\n");
+            return;
+        }
+
+        double total = 0;
+        for (Book book : books) {
+            total += book.price;
+        }
+
+        double average = total / books.size();
+        outputArea.appendText("Average Book Price: " + average + "\n");
+    }
+
+    public void showSearchResults(String search) {
+        outputArea.setText("SEARCH RESULTS\n\n");
+
+        boolean found = false;
+        ArrayList<String> results = new ArrayList<>();
+
+        if (search.endsWith("*")) {
+            String prefix = search.substring(0, search.length() - 1).toLowerCase();
+
+            for (Book book : books) {
+                if (book.title.toLowerCase().startsWith(prefix)) {
+                    String line = "Title: " + book.title + ", Available: " + book.available;
+                    outputArea.appendText(line + "\n");
+                    results.add(line);
+                    found = true;
+                }
+            }
+        } else {
+            for (Book book : books) {
+                if (book.title.equalsIgnoreCase(search)) {
+                    String line = "Title: " + book.title + ", Available: " + book.available;
+                    outputArea.appendText(line + "\n");
+                    results.add(line);
+                    found = true;
+                }
+            }
+        }
+
+        if (!found) {
+            outputArea.appendText("No matching books found.\n");
+        } else {
+            exportSearchResults(results);
+        }
+    }
+
     public void exportSearchResults(ArrayList<String> results) {
         try {
             PrintWriter writer = new PrintWriter(new FileWriter("../data/search_results.txt"));
