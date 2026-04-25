@@ -22,8 +22,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
-
 public class LibraryFxApp extends Application {
+
     private ArrayList<Book> books = new ArrayList<>();
     private ArrayList<Student> students = new ArrayList<>();
     private ArrayList<Transaction> transactions = new ArrayList<>();
@@ -167,6 +167,7 @@ public class LibraryFxApp extends Application {
 
         return books;
     }
+
     public ArrayList<Student> loadStudents() {
         ArrayList<Student> students = new ArrayList<>();
 
