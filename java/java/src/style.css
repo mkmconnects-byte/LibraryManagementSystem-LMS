@@ -102,36 +102,123 @@
 }
 
 .output-label {
-    -fx-text-fill: #71717a;
+    -fx-text-fill: #a1a1aa;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
+    -fx-padding: 0 0 0 2;
 }
 
-.text-area {
+.output-stack {
+    -fx-background-color: transparent;
+}
+
+.table-view {
+    -fx-background-color: rgba(24, 24, 27, 0.85);
+    -fx-border-color: #27272a;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 16, 0, 0, 4);
+}
+
+.table-view:focused {
+    -fx-background-color: rgba(24, 24, 27, 0.90);
+    -fx-border-color: #c9a227;
+    -fx-effect: dropshadow(gaussian, rgba(201,162,39,0.12), 12, 0, 0, 0);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1e1e22;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header-background .filler {
+    -fx-background-color: #1e1e22;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #2a2a30 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 14 10 14;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #71717a;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #1f1f23 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(39, 39, 42, 0.35);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgba(201, 162, 39, 0.06);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(201, 162, 39, 0.14);
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #fafafa;
+}
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-cell {
+    -fx-text-fill: #d4d4d8;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 8 14 8 14;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: #52525b;
+    -fx-font-size: 13px;
+}
+
+.message-area {
     -fx-font-family: "Consolas", monospace;
     -fx-font-size: 13px;
     -fx-text-fill: #d4d4d8;
     -fx-control-inner-background: #18181b;
-    -fx-background-color: #18181b;
+    -fx-background-color: rgba(24, 24, 27, 0.85);
     -fx-border-color: #27272a;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-border-width: 1;
-    -fx-padding: 10;
+    -fx-padding: 14;
     -fx-prompt-text-fill: #3f3f46;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 16, 0, 0, 4);
 }
 
-.text-area .content {
+.message-area .content {
     -fx-background-color: #18181b;
-    -fx-background-radius: 10;
+    -fx-background-radius: 12;
 }
 
-.text-area:focused {
+.message-area:focused {
     -fx-border-color: #c9a227;
-    -fx-effect: dropshadow(gaussian, rgba(201,162,39,0.15), 8, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(201,162,39,0.12), 12, 0, 0, 0);
 }
 
-.scroll-bar:vertical {
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
     -fx-background-color: transparent;
     -fx-padding: 2;
 }
@@ -153,4 +240,12 @@
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
     -fx-shape: "";
     -fx-padding: 0;
+}
+
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell {
+    -fx-background-color: transparent;
+}
+
+.table-view > .virtual-flow > .corner {
+    -fx-background-color: transparent;
 }

@@ -1,10 +1,23 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,18 +26,26 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-
 public class LibraryFxApp extends Application {
 
     public ArrayList<Book> books = new ArrayList<>();
     public ArrayList<Student> students = new ArrayList<>();
     public ArrayList<Transaction> transactions = new ArrayList<>();
 
-    private TextArea outputArea;
+    private StackPane outputStack;
+    private TableView<Book> bookTable;
+    private TableView<Student> studentTable;
+    private TableView<Transaction> transactionTable;
+    private TableView<Book> searchTable;
+    private TableView<Book> issuedReportTable;
+    private TextArea messageArea;
+    private Label outputTitleLabel;
+
+    private ArrayList<String> lastSearchResults = new ArrayList<>();
+
+    private Label statBooks;
+    private Label statStudents;
+    private Label statTransactions;
 
     public static void main(String[] args) {
         launch(args);
@@ -32,9 +53,137 @@ public class LibraryFxApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        outputArea = new TextArea();
-        outputArea.setEditable(false);
-        outputArea.setPromptText("Output will appear here...");
+
+        bookTable = new TableView<>();
+        bookTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        bookTable.setPlaceholder(new Label("No books loaded"));
+
+        TableColumn<Book, String> colBookId = new TableColumn<>("ID");
+        colBookId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().id));
+        colBookId.setMinWidth(60);
+
+        TableColumn<Book, String> colTitle = new TableColumn<>("Title");
+        colTitle.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().title));
+        colTitle.setMinWidth(160);
+
+        TableColumn<Book, String> colIsbn = new TableColumn<>("ISBN");
+        colIsbn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isbn));
+        colIsbn.setMinWidth(120);
+
+        TableColumn<Book, String> colAuthor = new TableColumn<>("Author");
+        colAuthor.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().author));
+        colAuthor.setMinWidth(120);
+
+        TableColumn<Book, Number> colCopies = new TableColumn<>("Copies");
+        colCopies.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().copies));
+        colCopies.setMinWidth(60);
+
+        TableColumn<Book, Number> colAvail = new TableColumn<>("Available");
+        colAvail.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().available));
+        colAvail.setMinWidth(70);
+
+        TableColumn<Book, Number> colPrice = new TableColumn<>("Price");
+        colPrice.setCellValueFactory(c -> new SimpleDoubleProperty(c.getValue().price));
+        colPrice.setMinWidth(70);
+
+        bookTable.getColumns().addAll(colBookId, colTitle, colIsbn, colAuthor, colCopies, colAvail, colPrice);
+
+        studentTable = new TableView<>();
+        studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        studentTable.setPlaceholder(new Label("No students loaded"));
+
+        TableColumn<Student, String> colStudId = new TableColumn<>("Student ID");
+        colStudId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().id));
+        colStudId.setMinWidth(120);
+
+        TableColumn<Student, String> colStudName = new TableColumn<>("Name");
+        colStudName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().name));
+        colStudName.setMinWidth(200);
+
+        studentTable.getColumns().addAll(colStudId, colStudName);
+
+        transactionTable = new TableView<>();
+        transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        transactionTable.setPlaceholder(new Label("No transactions loaded"));
+
+        TableColumn<Transaction, String> colDate = new TableColumn<>("Date");
+        colDate.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().date));
+        colDate.setMinWidth(100);
+
+        TableColumn<Transaction, String> colTBookId = new TableColumn<>("Book ID");
+        colTBookId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().bookId));
+        colTBookId.setMinWidth(80);
+
+        TableColumn<Transaction, String> colTStudId = new TableColumn<>("Student ID");
+        colTStudId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().studentId));
+        colTStudId.setMinWidth(100);
+
+        TableColumn<Transaction, String> colType = new TableColumn<>("Type");
+        colType.setCellValueFactory(c -> {
+            int t = c.getValue().type;
+            String label = (t == 1) ? "Issue" : (t == 2) ? "Return" : "Unknown";
+            return new SimpleStringProperty(label);
+        });
+        colType.setMinWidth(80);
+
+        transactionTable.getColumns().addAll(colDate, colTBookId, colTStudId, colType);
+
+        searchTable = new TableView<>();
+        searchTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        searchTable.setPlaceholder(new Label("No results"));
+
+        TableColumn<Book, String> colSrchId = new TableColumn<>("ID");
+        colSrchId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().id));
+        colSrchId.setMinWidth(60);
+
+        TableColumn<Book, String> colSrchTitle = new TableColumn<>("Title");
+        colSrchTitle.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().title));
+        colSrchTitle.setMinWidth(200);
+
+        TableColumn<Book, String> colSrchAuthor = new TableColumn<>("Author");
+        colSrchAuthor.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().author));
+        colSrchAuthor.setMinWidth(140);
+
+        TableColumn<Book, Number> colSrchAvail = new TableColumn<>("Available");
+        colSrchAvail.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().available));
+        colSrchAvail.setMinWidth(80);
+
+        searchTable.getColumns().addAll(colSrchId, colSrchTitle, colSrchAuthor, colSrchAvail);
+
+        issuedReportTable = new TableView<>();
+        issuedReportTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        issuedReportTable.setPlaceholder(new Label("No issued books for this date"));
+
+        TableColumn<Book, String> colIrId = new TableColumn<>("Book ID");
+        colIrId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().id));
+        colIrId.setMinWidth(80);
+
+        TableColumn<Book, String> colIrTitle = new TableColumn<>("Title");
+        colIrTitle.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().title));
+        colIrTitle.setMinWidth(200);
+
+        TableColumn<Book, String> colIrAuthor = new TableColumn<>("Author");
+        colIrAuthor.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().author));
+        colIrAuthor.setMinWidth(140);
+
+        TableColumn<Book, String> colIrIsbn = new TableColumn<>("ISBN");
+        colIrIsbn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isbn));
+        colIrIsbn.setMinWidth(120);
+
+        issuedReportTable.getColumns().addAll(colIrId, colIrTitle, colIrAuthor, colIrIsbn);
+
+        messageArea = new TextArea();
+        messageArea.setEditable(false);
+        messageArea.setWrapText(true);
+        messageArea.getStyleClass().add("message-area");
+
+        outputStack = new StackPane(bookTable, studentTable, transactionTable, searchTable, issuedReportTable, messageArea);
+        outputStack.getStyleClass().add("output-stack");
+        VBox.setVgrow(outputStack, Priority.ALWAYS);
+        showView(messageArea);
+
+        outputTitleLabel = new Label("OUTPUT");
+        outputTitleLabel.getStyleClass().add("output-label");
 
         Button btnLoadBooks = new Button("\u2709  Load Books");
         Button btnLoadStudents = new Button("\u263A  Load Students");
@@ -42,35 +191,34 @@ public class LibraryFxApp extends Application {
         Button btnIssuedReport = new Button("\u2630  Issued Report");
         Button btnAveragePrice = new Button("\u2211  Avg Price");
         Button btnSearchTitle = new Button("\u2315  Search Title");
+        Button btnExport = new Button("\u2913  Export Results");
 
         btnIssuedReport.getStyleClass().add("btn-outline");
         btnAveragePrice.getStyleClass().add("btn-outline");
         btnSearchTitle.getStyleClass().add("btn-outline");
+        btnExport.getStyleClass().add("btn-outline");
 
         btnLoadBooks.setOnAction(e -> {
             books = loadBooks();
-            outputArea.setText("Books loaded successfully.\n");
-            for (Book book : books) {
-                outputArea.appendText(book.toString() + "\n");
-            }
+            bookTable.getItems().setAll(books);
+            showView(bookTable);
+            outputTitleLabel.setText("BOOKS  ·  " + books.size() + " records loaded");
             updateStats();
         });
 
         btnLoadStudents.setOnAction(e -> {
             students = loadStudents();
-            outputArea.setText("Students loaded successfully.\n");
-            for (Student student : students) {
-                outputArea.appendText(student.toString() + "\n");
-            }
+            studentTable.getItems().setAll(students);
+            showView(studentTable);
+            outputTitleLabel.setText("STUDENTS  ·  " + students.size() + " records loaded");
             updateStats();
         });
 
         btnLoadTransactions.setOnAction(e -> {
             transactions = loadTransactions();
-            outputArea.setText("Transactions loaded successfully.\n");
-            for (Transaction transaction : transactions) {
-                outputArea.appendText(transaction.toString() + "\n");
-            }
+            transactionTable.getItems().setAll(transactions);
+            showView(transactionTable);
+            outputTitleLabel.setText("TRANSACTIONS  ·  " + transactions.size() + " records loaded");
             updateStats();
         });
 
@@ -94,6 +242,20 @@ public class LibraryFxApp extends Application {
             result.ifPresent(this::showSearchResults);
         });
 
+        btnExport.setOnAction(e -> {
+            if (lastSearchResults.isEmpty()) {
+                messageArea.setText("Nothing to export. Run a search first.");
+                showView(messageArea);
+                outputTitleLabel.setText("EXPORT");
+            } else {
+                exportSearchResults(lastSearchResults);
+                messageArea.setText("Exported " + lastSearchResults.size()
+                        + " result(s) to data/search_results.txt");
+                showView(messageArea);
+                outputTitleLabel.setText("EXPORT  ·  " + lastSearchResults.size() + " results saved");
+            }
+        });
+
         Label titleLabel = new Label("Library Management System");
         titleLabel.getStyleClass().add("main-title");
 
@@ -106,8 +268,8 @@ public class LibraryFxApp extends Application {
         Label headerIcon = new Label("\uD83D\uDCDA");
         headerIcon.getStyleClass().add("header-icon");
 
-        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         HBox headerBar = new HBox(titleBox, spacer, headerIcon);
         headerBar.getStyleClass().add("header-bar");
@@ -141,20 +303,15 @@ public class LibraryFxApp extends Application {
         Label actionsLabel = new Label("ACTIONS");
         actionsLabel.getStyleClass().add("section-label");
 
-        HBox actionButtons = new HBox(12, btnIssuedReport, btnAveragePrice, btnSearchTitle);
+        HBox actionButtons = new HBox(12, btnIssuedReport, btnAveragePrice, btnSearchTitle, btnExport);
         actionButtons.setAlignment(Pos.CENTER_LEFT);
 
         VBox actionsSection = new VBox(8, actionsLabel, actionButtons);
         actionsSection.setPadding(new Insets(0, 28, 0, 28));
 
-        Label outputLabel = new Label("OUTPUT");
-        outputLabel.getStyleClass().add("output-label");
-
-        outputArea.setPrefHeight(200);
-
-        VBox outputSection = new VBox(8, outputLabel, outputArea);
+        VBox outputSection = new VBox(8, outputTitleLabel, outputStack);
         outputSection.setPadding(new Insets(0, 28, 20, 28));
-        VBox.setVgrow(outputArea, javafx.scene.layout.Priority.ALWAYS);
+        VBox.setVgrow(outputSection, Priority.ALWAYS);
 
         VBox root = new VBox(20,
                 headerBar,
@@ -162,9 +319,9 @@ public class LibraryFxApp extends Application {
                 dataSection,
                 actionsSection,
                 outputSection);
-        VBox.setVgrow(outputSection, javafx.scene.layout.Priority.ALWAYS);
+        VBox.setVgrow(outputSection, Priority.ALWAYS);
 
-        Scene scene = new Scene(root, 780, 660);
+        Scene scene = new Scene(root, 960, 720);
         scene.getStylesheets().add("style.css");
 
         primaryStage.setTitle("Library Management System");
@@ -172,9 +329,12 @@ public class LibraryFxApp extends Application {
         primaryStage.show();
     }
 
-    private Label statBooks;
-    private Label statStudents;
-    private Label statTransactions;
+    private void showView(javafx.scene.Node target) {
+        for (javafx.scene.Node child : outputStack.getChildren()) {
+            child.setVisible(child == target);
+            child.setManaged(child == target);
+        }
+    }
 
     private VBox buildStatCard(String label, Label valueLabel) {
         Label lbl = new Label(label);
@@ -227,7 +387,9 @@ public class LibraryFxApp extends Application {
 
             br.close();
         } catch (Exception e) {
-            outputArea.setText("Error loading books.\n" + e.getMessage());
+            messageArea.setText("Error loading books.\n" + e.getMessage());
+            showView(messageArea);
+            outputTitleLabel.setText("ERROR");
         }
 
         return books;
@@ -258,7 +420,9 @@ public class LibraryFxApp extends Application {
 
             br.close();
         } catch (Exception e) {
-            outputArea.setText("Error loading students.\n" + e.getMessage());
+            messageArea.setText("Error loading students.\n" + e.getMessage());
+            showView(messageArea);
+            outputTitleLabel.setText("ERROR");
         }
 
         return students;
@@ -297,40 +461,42 @@ public class LibraryFxApp extends Application {
 
             br.close();
         } catch (Exception e) {
-            outputArea.setText("Error loading transactions.\n" + e.getMessage());
+            messageArea.setText("Error loading transactions.\n" + e.getMessage());
+            showView(messageArea);
+            outputTitleLabel.setText("ERROR");
         }
 
         return transactions;
     }
 
     public void showBooksIssuedReport(String date) {
-        outputArea.setText("BOOKS ISSUED REPORT FOR " + date + "\n\n");
-
-        boolean found = false;
+        ArrayList<Book> issuedBooks = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
             if (transaction.date.equals(date) && transaction.type == 1) {
                 Book book = findBookById(transaction.bookId);
-                found = true;
-
                 if (book != null) {
-                    outputArea.appendText("Book ID: " + book.id + ", Title: " + book.title + "\n");
-                } else {
-                    outputArea.appendText("Book ID: " + transaction.bookId + ", Title not found\n");
+                    issuedBooks.add(book);
                 }
             }
         }
 
-        if (!found) {
-            outputArea.appendText("No issued books found for this date.\n");
+        issuedReportTable.getItems().setAll(issuedBooks);
+        showView(issuedReportTable);
+        outputTitleLabel.setText("ISSUED REPORT  ·  " + date + "  ·  " + issuedBooks.size() + " books");
+
+        if (issuedBooks.isEmpty()) {
+            messageArea.setText("No issued books found for " + date + ".");
+            showView(messageArea);
+            outputTitleLabel.setText("ISSUED REPORT  ·  " + date);
         }
     }
 
     public void showAverageBookPrice() {
-        outputArea.setText("AVERAGE BOOK PRICE\n\n");
-
         if (books.size() == 0) {
-            outputArea.appendText("No books available.\n");
+            messageArea.setText("No books available. Load books first.");
+            showView(messageArea);
+            outputTitleLabel.setText("AVERAGE PRICE");
             return;
         }
 
@@ -340,54 +506,63 @@ public class LibraryFxApp extends Application {
         }
 
         double average = total / books.size();
-        outputArea.appendText("Average Book Price: " + average + "\n");
+        messageArea.setText(String.format(
+                "Average Book Price\n\n" +
+                "  Total books  :  %d\n" +
+                "  Sum of prices:  %.2f\n" +
+                "  Average price:  %.2f", books.size(), total, average));
+        showView(messageArea);
+        outputTitleLabel.setText("AVERAGE PRICE  ·  " + String.format("%.2f", average));
     }
 
     public void showSearchResults(String search) {
-        outputArea.setText("SEARCH RESULTS\n\n");
-
-        boolean found = false;
-        ArrayList<String> results = new ArrayList<>();
+        ArrayList<Book> matchedBooks = new ArrayList<>();
+        ArrayList<String> resultLines = new ArrayList<>();
 
         if (search.endsWith("*")) {
             String prefix = search.substring(0, search.length() - 1).toLowerCase();
 
             for (Book book : books) {
                 if (book.title.toLowerCase().startsWith(prefix)) {
-                    String line = "Title: " + book.title + ", Available: " + book.available;
-                    outputArea.appendText(line + "\n");
-                    results.add(line);
-                    found = true;
+                    matchedBooks.add(book);
+                    resultLines.add("Title: " + book.title + ", Available: " + book.available);
                 }
             }
         } else {
             for (Book book : books) {
                 if (book.title.equalsIgnoreCase(search)) {
-                    String line = "Title: " + book.title + ", Available: " + book.available;
-                    outputArea.appendText(line + "\n");
-                    results.add(line);
-                    found = true;
+                    matchedBooks.add(book);
+                    resultLines.add("Title: " + book.title + ", Available: " + book.available);
                 }
             }
         }
 
-        if (!found) {
-            outputArea.appendText("No matching books found.\n");
+        lastSearchResults = resultLines;
+
+        searchTable.getItems().setAll(matchedBooks);
+        showView(searchTable);
+        outputTitleLabel.setText("SEARCH RESULTS  ·  \"" + search + "\"  ·  " + matchedBooks.size() + " found");
+
+        if (matchedBooks.isEmpty()) {
+            messageArea.setText("No matching books found for \"" + search + "\".");
+            showView(messageArea);
+            outputTitleLabel.setText("SEARCH RESULTS  ·  \"" + search + "\"");
         } else {
-            exportSearchResults(results);
+            exportSearchResults(resultLines);
         }
     }
 
     public void exportSearchResults(ArrayList<String> results) {
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter("../data/search_results.txt"));
+            PrintWriter writer = new PrintWriter(new FileWriter("../../data/search_results.txt"));
             for (String line : results) {
                 writer.println(line);
             }
             writer.close();
-            outputArea.appendText("\nSearch results exported to data/search_results.txt\n");
         } catch (Exception e) {
-            outputArea.appendText("\nError exporting search results.\n");
+            messageArea.setText("Error exporting search results.\n" + e.getMessage());
+            showView(messageArea);
+            outputTitleLabel.setText("EXPORT ERROR");
         }
     }
 
