@@ -16,11 +16,7 @@ import java.util.Optional;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 
 public class LibraryFxApp extends Application {
 
@@ -37,21 +33,30 @@ public class LibraryFxApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         outputArea = new TextArea();
-        outputArea.setPrefHeight(400);
+        outputArea.setEditable(false);
+        outputArea.setPromptText("Output will appear here...");
 
-        Button btnLoadBooks = new Button("Load Books");
-        Button btnLoadStudents = new Button("Load Students");
-        Button btnLoadTransactions = new Button("Load Transactions");
-        Button btnIssuedReport = new Button("Books Issued Report");
-        Button btnAveragePrice = new Button("Average Book Price");
-        Button btnSearchTitle = new Button("Search by Title");
+        // ── Buttons ──
+        Button btnLoadBooks = new Button("\u2709  Load Books");
+        Button btnLoadStudents = new Button("\u263A  Load Students");
+        Button btnLoadTransactions = new Button("\u21C4  Load Transactions");
+        Button btnIssuedReport = new Button("\u2630  Issued Report");
+        Button btnAveragePrice = new Button("\u2211  Avg Price");
+        Button btnSearchTitle = new Button("\u2315  Search Title");
 
+        // outline style for action buttons
+        btnIssuedReport.getStyleClass().add("btn-outline");
+        btnAveragePrice.getStyleClass().add("btn-outline");
+        btnSearchTitle.getStyleClass().add("btn-outline");
+
+        // ── Button handlers ──
         btnLoadBooks.setOnAction(e -> {
             books = loadBooks();
             outputArea.setText("Books loaded successfully.\n");
             for (Book book : books) {
                 outputArea.appendText(book.toString() + "\n");
             }
+            updateStats();
         });
 
         btnLoadStudents.setOnAction(e -> {
@@ -60,6 +65,7 @@ public class LibraryFxApp extends Application {
             for (Student student : students) {
                 outputArea.appendText(student.toString() + "\n");
             }
+            updateStats();
         });
 
         btnLoadTransactions.setOnAction(e -> {
@@ -68,6 +74,7 @@ public class LibraryFxApp extends Application {
             for (Transaction transaction : transactions) {
                 outputArea.appendText(transaction.toString() + "\n");
             }
+            updateStats();
         });
 
         btnIssuedReport.setOnAction(e -> {
@@ -75,7 +82,6 @@ public class LibraryFxApp extends Application {
             dialog.setTitle("Books Issued Report");
             dialog.setHeaderText("Enter date");
             dialog.setContentText("Date (DD/MM/YYYY):");
-
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(date -> showBooksIssuedReport(date));
         });
@@ -87,52 +93,110 @@ public class LibraryFxApp extends Application {
             dialog.setTitle("Search Book");
             dialog.setHeaderText("Enter title or prefix");
             dialog.setContentText("Title or prefix: ");
-
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(this::showSearchResults);
         });
 
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(15));
+        // ═══════════════════════════════════════════
+        // LAYOUT
+        // ═══════════════════════════════════════════
 
-        HBox topBar = new HBox(15, btnLoadBooks, btnLoadStudents, btnLoadTransactions);
-        topBar.setAlignment(Pos.CENTER);
-        topBar.getStyleClass().add("top-bar");
+        // ── Header ──
+        Label titleLabel = new Label("Library Management System");
+        titleLabel.getStyleClass().add("main-title");
 
-        HBox bottomBar = new HBox(15, btnIssuedReport, btnAveragePrice, btnSearchTitle);
-        bottomBar.setAlignment(Pos.CENTER);
-        bottomBar.getStyleClass().add("bottom-bar");
+        Label subtitleLabel = new Label("Manage books, students and transactions");
+        subtitleLabel.getStyleClass().add("sub-title");
 
-        ImageView imageView = new ImageView(new Image("file:book.jpg"));
-        imageView.setFitWidth(260);
-        imageView.setFitHeight(260);
-        imageView.setPreserveRatio(true);
-        imageView.setStyle(
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.3, 0, 5);" +
-                "-fx-background-radius: 20;"
-        );
+        VBox titleBox = new VBox(2, titleLabel, subtitleLabel);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label centerTitle = new Label("Library Management System");
-        centerTitle.getStyleClass().add("main-title");
+        HBox headerBar = new HBox(titleBox);
+        headerBar.getStyleClass().add("header-bar");
+        headerBar.setAlignment(Pos.CENTER_LEFT);
 
-        VBox centerBox = new VBox(20, centerTitle, imageView);
-        centerBox.setAlignment(Pos.CENTER);
+        // ── Stat Cards ──
+        statBooks = new Label("0");
+        statStudents = new Label("0");
+        statTransactions = new Label("0");
 
-        outputArea.setPrefHeight(180);
+        statBooks.getStyleClass().add("stat-value");
+        statStudents.getStyleClass().add("stat-value");
+        statTransactions.getStyleClass().add("stat-value");
 
-        VBox bottomSection = new VBox(15, bottomBar, outputArea);
-        bottomSection.setAlignment(Pos.CENTER);
+        VBox cardBooks = buildStatCard("Books", statBooks);
+        VBox cardStudents = buildStatCard("Students", statStudents);
+        VBox cardTransactions = buildStatCard("Transactions", statTransactions);
 
-        root.setTop(topBar);
-        root.setCenter(centerBox);
-        root.setBottom(bottomSection);
+        HBox statsRow = new HBox(16, cardBooks, cardStudents, cardTransactions);
+        statsRow.setAlignment(Pos.CENTER_LEFT);
+        statsRow.setPadding(new Insets(0, 28, 0, 28));
 
-        Scene scene = new Scene(root, 900, 700);
+        // ── Data Section ──
+        Label dataLabel = new Label("DATA");
+        dataLabel.getStyleClass().add("section-label");
+
+        HBox dataButtons = new HBox(12, btnLoadBooks, btnLoadStudents, btnLoadTransactions);
+        dataButtons.setAlignment(Pos.CENTER_LEFT);
+
+        VBox dataSection = new VBox(8, dataLabel, dataButtons);
+        dataSection.setPadding(new Insets(0, 28, 0, 28));
+
+        // ── Actions Section ──
+        Label actionsLabel = new Label("ACTIONS");
+        actionsLabel.getStyleClass().add("section-label");
+
+        HBox actionButtons = new HBox(12, btnIssuedReport, btnAveragePrice, btnSearchTitle);
+        actionButtons.setAlignment(Pos.CENTER_LEFT);
+
+        VBox actionsSection = new VBox(8, actionsLabel, actionButtons);
+        actionsSection.setPadding(new Insets(0, 28, 0, 28));
+
+        // ── Output Console ──
+        Label outputLabel = new Label("OUTPUT");
+        outputLabel.getStyleClass().add("output-label");
+
+        outputArea.setPrefHeight(200);
+
+        VBox outputSection = new VBox(8, outputLabel, outputArea);
+        outputSection.setPadding(new Insets(0, 28, 20, 28));
+        VBox.setVgrow(outputArea, javafx.scene.layout.Priority.ALWAYS);
+
+        // ── Root Assembly ──
+        VBox root = new VBox(20,
+                headerBar,
+                statsRow,
+                dataSection,
+                actionsSection,
+                outputSection);
+        VBox.setVgrow(outputSection, javafx.scene.layout.Priority.ALWAYS);
+
+        Scene scene = new Scene(root, 780, 660);
         scene.getStylesheets().add("style.css");
 
-        primaryStage.setTitle("Library Management System - JavaFX");
+        primaryStage.setTitle("Library Management System");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    // ── Stat card helper ──
+    private Label statBooks;
+    private Label statStudents;
+    private Label statTransactions;
+
+    private VBox buildStatCard(String label, Label valueLabel) {
+        Label lbl = new Label(label);
+        lbl.getStyleClass().add("stat-label");
+        VBox card = new VBox(4, lbl, valueLabel);
+        card.getStyleClass().add("stat-card");
+        card.setPrefWidth(180);
+        return card;
+    }
+
+    private void updateStats() {
+        statBooks.setText(String.valueOf(books.size()));
+        statStudents.setText(String.valueOf(students.size()));
+        statTransactions.setText(String.valueOf(transactions.size()));
     }
 
     public ArrayList<Book> loadBooks() {
@@ -146,7 +210,8 @@ public class LibraryFxApp extends Application {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
 
-                if (parts.length != 7) continue;
+                if (parts.length != 7)
+                    continue;
 
                 String id = parts[0];
                 String title = parts[1];
@@ -156,10 +221,14 @@ public class LibraryFxApp extends Application {
                 int available = Integer.parseInt(parts[5]);
                 double price = Double.parseDouble(parts[6]);
 
-                if (!Validator.validBookId(id)) continue;
-                if (!Validator.validIsbn13(isbn)) continue;
-                if (!Validator.validCopies(copies)) continue;
-                if (!Validator.validAvailability(available, copies)) continue;
+                if (!Validator.validBookId(id))
+                    continue;
+                if (!Validator.validIsbn13(isbn))
+                    continue;
+                if (!Validator.validCopies(copies))
+                    continue;
+                if (!Validator.validAvailability(available, copies))
+                    continue;
 
                 books.add(new Book(id, title, isbn, author, copies, available, price));
             }
@@ -183,12 +252,14 @@ public class LibraryFxApp extends Application {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
 
-                if (parts.length != 2) continue;
+                if (parts.length != 2)
+                    continue;
 
                 String id = parts[0];
                 String name = parts[1];
 
-                if (!Validator.validStudentId(id)) continue;
+                if (!Validator.validStudentId(id))
+                    continue;
 
                 students.add(new Student(id, name));
             }
@@ -212,17 +283,22 @@ public class LibraryFxApp extends Application {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
 
-                if (parts.length != 4) continue;
+                if (parts.length != 4)
+                    continue;
 
                 String date = parts[0];
                 String bookId = parts[1];
                 String studentId = parts[2];
                 int type = Integer.parseInt(parts[3]);
 
-                if (!Validator.validDate(date)) continue;
-                if (!Validator.validBookId(bookId)) continue;
-                if (!Validator.validStudentId(studentId)) continue;
-                if (!Validator.validTransactionType(type)) continue;
+                if (!Validator.validDate(date))
+                    continue;
+                if (!Validator.validBookId(bookId))
+                    continue;
+                if (!Validator.validStudentId(studentId))
+                    continue;
+                if (!Validator.validTransactionType(type))
+                    continue;
 
                 transactions.add(new Transaction(date, bookId, studentId, type));
             }
