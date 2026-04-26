@@ -74,4 +74,9 @@ mkm.connects aka Manuja Keshara
 ---
 
 ## Note
-Feel free to donwload the app, use to your personal preference and edit the code to your need.
+Feel free to donwload the application, use to your personal preference and edit the code to your need.
+
+---
+
+## Status
+Completed ✔
