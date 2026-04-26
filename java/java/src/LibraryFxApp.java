@@ -24,9 +24,9 @@ import javafx.scene.layout.StackPane;
 
 public class LibraryFxApp extends Application {
 
-    private ArrayList<Book> books = new ArrayList<>();
-    private ArrayList<Student> students = new ArrayList<>();
-    private ArrayList<Transaction> transactions = new ArrayList<>();
+    public ArrayList<Book> books = new ArrayList<>();
+    public ArrayList<Student> students = new ArrayList<>();
+    public ArrayList<Transaction> transactions = new ArrayList<>();
 
     private TextArea outputArea;
 
