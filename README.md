@@ -16,7 +16,11 @@ The Python program allows the user to:
 - Add student records  
 - Issue and return books  
 - Store and manage data using CSV files  
-- Handle invalid inputs with appropriate error messages  
+- Handle invalid inputs with appropriate error messages
+
+
+### Python Terminal
+![Python Terminal](sources/pythonTerminal.png)
 
 ---
 
@@ -27,7 +31,11 @@ The Java program provides a graphical interface to:
 - Generate a books issued report for a selected date  
 - Calculate the average price of books  
 - Search for books by title (including prefix search using *)  
-- Export search results to a text file  
+- Export search results to a text file
+
+
+### FX
+![FX](sources/javaFXl.png)
 
 ---
 
