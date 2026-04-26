@@ -1,11 +1,9 @@
-/* ===== ROOT ===== */
 .root {
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-background-color: #111113;
     -fx-padding: 0;
 }
 
-/* ===== HEADER BAR ===== */
 .header-bar {
     -fx-padding: 22 30 22 30;
     -fx-background-color: #18181b;
@@ -13,7 +11,10 @@
     -fx-border-width: 0 0 1 0;
 }
 
-/* ===== BUTTONS ===== */
+.header-icon {
+    -fx-font-size: 36px;
+}
+
 .button {
     -fx-background-color: #c9a227;
     -fx-text-fill: #111113;
@@ -36,7 +37,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* ===== OUTLINE BUTTONS ===== */
 .btn-outline {
     -fx-background-color: transparent;
     -fx-text-fill: #c9a227;
@@ -63,7 +63,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* ===== TITLE ===== */
 .main-title {
     -fx-text-fill: #fafafa;
     -fx-font-size: 28px;
@@ -75,7 +74,6 @@
     -fx-font-size: 14px;
 }
 
-/* ===== STAT CARDS ===== */
 .stat-card {
     -fx-background-color: #18181b;
     -fx-background-radius: 12;
@@ -97,21 +95,18 @@
     -fx-font-weight: bold;
 }
 
-/* ===== SECTION LABELS ===== */
 .section-label {
     -fx-text-fill: #52525b;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
-/* ===== OUTPUT LABEL ===== */
 .output-label {
     -fx-text-fill: #71717a;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 
-/* ===== TEXT AREA ===== */
 .text-area {
     -fx-font-family: "Consolas", monospace;
     -fx-font-size: 13px;
@@ -136,7 +131,6 @@
     -fx-effect: dropshadow(gaussian, rgba(201,162,39,0.15), 8, 0, 0, 0);
 }
 
-/* ===== SCROLLBARS ===== */
 .scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-padding: 2;

@@ -2,7 +2,7 @@ public class Transaction {
     public String date;
     public String bookId;
     public String studentId;
-    public int type; // 1 = issue, 2 = return
+    public int type;
 
     public Transaction(String date, String bookId, String studentId, int type) {
         this.date = date;

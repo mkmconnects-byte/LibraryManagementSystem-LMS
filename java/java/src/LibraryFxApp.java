@@ -36,7 +36,6 @@ public class LibraryFxApp extends Application {
         outputArea.setEditable(false);
         outputArea.setPromptText("Output will appear here...");
 
-        // ── Buttons ──
         Button btnLoadBooks = new Button("\u2709  Load Books");
         Button btnLoadStudents = new Button("\u263A  Load Students");
         Button btnLoadTransactions = new Button("\u21C4  Load Transactions");
@@ -44,12 +43,10 @@ public class LibraryFxApp extends Application {
         Button btnAveragePrice = new Button("\u2211  Avg Price");
         Button btnSearchTitle = new Button("\u2315  Search Title");
 
-        // outline style for action buttons
         btnIssuedReport.getStyleClass().add("btn-outline");
         btnAveragePrice.getStyleClass().add("btn-outline");
         btnSearchTitle.getStyleClass().add("btn-outline");
 
-        // ── Button handlers ──
         btnLoadBooks.setOnAction(e -> {
             books = loadBooks();
             outputArea.setText("Books loaded successfully.\n");
@@ -97,11 +94,6 @@ public class LibraryFxApp extends Application {
             result.ifPresent(this::showSearchResults);
         });
 
-        // ═══════════════════════════════════════════
-        // LAYOUT
-        // ═══════════════════════════════════════════
-
-        // ── Header ──
         Label titleLabel = new Label("Library Management System");
         titleLabel.getStyleClass().add("main-title");
 
@@ -111,11 +103,16 @@ public class LibraryFxApp extends Application {
         VBox titleBox = new VBox(2, titleLabel, subtitleLabel);
         titleBox.setAlignment(Pos.CENTER_LEFT);
 
-        HBox headerBar = new HBox(titleBox);
+        Label headerIcon = new Label("\uD83D\uDCDA");
+        headerIcon.getStyleClass().add("header-icon");
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        HBox headerBar = new HBox(titleBox, spacer, headerIcon);
         headerBar.getStyleClass().add("header-bar");
         headerBar.setAlignment(Pos.CENTER_LEFT);
 
-        // ── Stat Cards ──
         statBooks = new Label("0");
         statStudents = new Label("0");
         statTransactions = new Label("0");
@@ -132,7 +129,6 @@ public class LibraryFxApp extends Application {
         statsRow.setAlignment(Pos.CENTER_LEFT);
         statsRow.setPadding(new Insets(0, 28, 0, 28));
 
-        // ── Data Section ──
         Label dataLabel = new Label("DATA");
         dataLabel.getStyleClass().add("section-label");
 
@@ -142,7 +138,6 @@ public class LibraryFxApp extends Application {
         VBox dataSection = new VBox(8, dataLabel, dataButtons);
         dataSection.setPadding(new Insets(0, 28, 0, 28));
 
-        // ── Actions Section ──
         Label actionsLabel = new Label("ACTIONS");
         actionsLabel.getStyleClass().add("section-label");
 
@@ -152,7 +147,6 @@ public class LibraryFxApp extends Application {
         VBox actionsSection = new VBox(8, actionsLabel, actionButtons);
         actionsSection.setPadding(new Insets(0, 28, 0, 28));
 
-        // ── Output Console ──
         Label outputLabel = new Label("OUTPUT");
         outputLabel.getStyleClass().add("output-label");
 
@@ -162,7 +156,6 @@ public class LibraryFxApp extends Application {
         outputSection.setPadding(new Insets(0, 28, 20, 28));
         VBox.setVgrow(outputArea, javafx.scene.layout.Priority.ALWAYS);
 
-        // ── Root Assembly ──
         VBox root = new VBox(20,
                 headerBar,
                 statsRow,
@@ -179,7 +172,6 @@ public class LibraryFxApp extends Application {
         primaryStage.show();
     }
 
-    // ── Stat card helper ──
     private Label statBooks;
     private Label statStudents;
     private Label statTransactions;

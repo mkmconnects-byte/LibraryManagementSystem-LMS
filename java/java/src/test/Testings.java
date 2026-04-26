@@ -2,11 +2,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 
-
-
 public class Testings {
 
-    //Books
     @Test
     void testFindBookById_found() {
         LibraryFxApp app = new LibraryFxApp();
@@ -20,7 +17,6 @@ public class Testings {
         assertEquals("Java", result.title);
     }
 
-
     @Test
     void testFindBookById_notFound() {
         LibraryFxApp app = new LibraryFxApp();
@@ -31,8 +27,6 @@ public class Testings {
 
         assertNull(result);
     }
-
-    //Average Price
 
     @Test
     void testAverageBookPriceCalculation() {
@@ -70,4 +64,3 @@ public class Testings {
         assertTrue(found);
     }
 }
-
