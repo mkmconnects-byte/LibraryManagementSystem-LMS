@@ -35,7 +35,7 @@ The Java program provides a graphical interface to:
 
 
 ### FX
-![FX](sources/javaFXl.png)
+![FX](sources/javaFX.png)
 
 ---
 
