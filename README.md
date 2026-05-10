@@ -73,6 +73,12 @@ mkm.connects aka Manuja Keshara
 
 ---
 
+## Contact
+Go ahead and contact me via email
+mkm.connects@gmail.com
+
+---
+
 ## Note
 Feel free to donwload the application, use to your personal preference and edit the code to your need.
 
