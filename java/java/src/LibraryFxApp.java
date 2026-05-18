@@ -353,43 +353,66 @@ public class LibraryFxApp extends Application {
 
     public ArrayList<Book> loadBooks() {
         ArrayList<Book> books = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader("../../data/book.csv"));
             String line;
             br.readLine();
+            int lineNum = 1;
 
             while ((line = br.readLine()) != null) {
+                lineNum++;
                 String[] parts = line.split(",");
 
-                if (parts.length != 7)
+                if (parts.length != 7) {
+                    errors.add("Line " + lineNum + ": Wrong number of columns → " + line);
                     continue;
+                }
 
                 String id = parts[0];
                 String title = parts[1];
                 String isbn = parts[2].replace("-", "").trim();
                 String author = parts[3];
-                int copies = Integer.parseInt(parts[4]);
-                int available = Integer.parseInt(parts[5]);
-                double price = Double.parseDouble(parts[6]);
 
-                if (!Validator.validBookId(id))
-                    continue;
-                if (!Validator.validIsbn13(isbn))
-                    continue;
-                if (!Validator.validCopies(copies))
-                    continue;
-                if (!Validator.validAvailability(available, copies))
-                    continue;
+                try {
+                    int copies = Integer.parseInt(parts[4]);
+                    int available = Integer.parseInt(parts[5]);
+                    double price = Double.parseDouble(parts[6]);
 
-                books.add(new Book(id, title, isbn, author, copies, available, price));
+                    if (!Validator.validBookId(id)) {
+                        errors.add("Line " + lineNum + ": Invalid Book ID → " + id);
+                        continue;
+                    }
+                    if (!Validator.validIsbn13(isbn)) {
+                        errors.add("Line " + lineNum + ": Invalid ISBN → " + isbn);
+                        continue;
+                    }
+                    if (!Validator.validCopies(copies)) {
+                        errors.add("Line " + lineNum + ": Invalid copies → " + copies);
+                        continue;
+                    }
+                    if (!Validator.validAvailability(available, copies)) {
+                        errors.add("Line " + lineNum + ": Available > copies → " + available + "/" + copies);
+                        continue;
+                    }
+
+                    books.add(new Book(id, title, isbn, author, copies, available, price));
+
+                } catch (NumberFormatException e) {
+                    errors.add("Line " + lineNum + ": Non-numeric value → " + line);
+                }
             }
-
             br.close();
         } catch (Exception e) {
             messageArea.setText("Error loading books.\n" + e.getMessage());
             showView(messageArea);
             outputTitleLabel.setText("ERROR");
+            return books;
+        }
+
+        if (!errors.isEmpty()) {
+            showErrorDialog("Book Load Errors", books.size() + " books loaded. " + errors.size() + " rows skipped:", errors, "../../data/book.csv");
         }
 
         return books;
@@ -397,32 +420,43 @@ public class LibraryFxApp extends Application {
 
     public ArrayList<Student> loadStudents() {
         ArrayList<Student> students = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader("../../data/student.csv"));
             String line;
             br.readLine();
+            int lineNum = 1;
 
             while ((line = br.readLine()) != null) {
+                lineNum++;
                 String[] parts = line.split(",");
 
-                if (parts.length != 2)
+                if (parts.length != 2) {
+                    errors.add("Line " + lineNum + ": Wrong columns → " + line);
                     continue;
+                }
 
                 String id = parts[0];
                 String name = parts[1];
 
-                if (!Validator.validStudentId(id))
+                if (!Validator.validStudentId(id)) {
+                    errors.add("Line " + lineNum + ": Invalid Student ID → " + id);
                     continue;
+                }
 
                 students.add(new Student(id, name));
             }
-
             br.close();
         } catch (Exception e) {
             messageArea.setText("Error loading students.\n" + e.getMessage());
             showView(messageArea);
             outputTitleLabel.setText("ERROR");
+            return students;
+        }
+
+        if (!errors.isEmpty()) {
+            showErrorDialog("Student Load Errors", students.size() + " students loaded. " + errors.size() + " rows skipped:", errors, "../../data/student.csv");
         }
 
         return students;
@@ -430,40 +464,63 @@ public class LibraryFxApp extends Application {
 
     public ArrayList<Transaction> loadTransactions() {
         ArrayList<Transaction> transactions = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader("../../data/transactions.csv"));
             String line;
             br.readLine();
+            int lineNum = 1;
 
             while ((line = br.readLine()) != null) {
+                lineNum++;
                 String[] parts = line.split(",");
 
-                if (parts.length != 4)
+                if (parts.length != 4) {
+                    errors.add("Line " + lineNum + ": Wrong columns → " + line);
                     continue;
+                }
 
                 String date = parts[0];
                 String bookId = parts[1];
                 String studentId = parts[2];
-                int type = Integer.parseInt(parts[3]);
 
-                if (!Validator.validDate(date))
-                    continue;
-                if (!Validator.validBookId(bookId))
-                    continue;
-                if (!Validator.validStudentId(studentId))
-                    continue;
-                if (!Validator.validTransactionType(type))
-                    continue;
+                try {
+                    int type = Integer.parseInt(parts[3]);
 
-                transactions.add(new Transaction(date, bookId, studentId, type));
+                    if (!Validator.validDate(date)) {
+                        errors.add("Line " + lineNum + ": Invalid date → " + date);
+                        continue;
+                    }
+                    if (!Validator.validBookId(bookId)) {
+                        errors.add("Line " + lineNum + ": Invalid Book ID → " + bookId);
+                        continue;
+                    }
+                    if (!Validator.validStudentId(studentId)) {
+                        errors.add("Line " + lineNum + ": Invalid Student ID → " + studentId);
+                        continue;
+                    }
+                    if (!Validator.validTransactionType(type)) {
+                        errors.add("Line " + lineNum + ": Invalid type (must be 1 or 2) → " + type);
+                        continue;
+                    }
+
+                    transactions.add(new Transaction(date, bookId, studentId, type));
+
+                } catch (NumberFormatException e) {
+                    errors.add("Line " + lineNum + ": Non-numeric type → " + parts[3]);
+                }
             }
-
             br.close();
         } catch (Exception e) {
             messageArea.setText("Error loading transactions.\n" + e.getMessage());
             showView(messageArea);
             outputTitleLabel.setText("ERROR");
+            return transactions;
+        }
+
+        if (!errors.isEmpty()) {
+            showErrorDialog("Transaction Load Errors", transactions.size() + " loaded. " + errors.size() + " rows skipped:", errors, "../../data/transactions.csv");
         }
 
         return transactions;
@@ -573,5 +630,106 @@ public class LibraryFxApp extends Application {
             }
         }
         return null;
+    }
+
+    private void showErrorDialog(String title, String summary, ArrayList<String> errors, String filePath) {
+
+        javafx.scene.control.ListView<String> errorList = new javafx.scene.control.ListView<>();
+        errorList.getItems().addAll(errors);
+        errorList.setPrefHeight(200);
+
+
+        javafx.scene.control.TextArea fileEditor = new javafx.scene.control.TextArea();
+        fileEditor.setPromptText("Loading file...");
+        fileEditor.setWrapText(false);
+        fileEditor.setPrefHeight(250);
+
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader br = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            br.close();
+            fileEditor.setText(sb.toString());
+        } catch (Exception e) {
+            fileEditor.setText("Could not load file: " + e.getMessage());
+        }
+
+        Label summaryLabel = new Label(summary);
+        summaryLabel.setStyle("-fx-font-weight: bold; -fx-padding: 0 0 6 0;");
+
+        Label errorsLabel = new Label("Invalid rows:");
+        errorsLabel.setStyle("-fx-padding: 8 0 4 0;");
+
+        Label editorLabel = new Label("Edit the CSV below and click Save & Reload:");
+        editorLabel.setStyle("-fx-padding: 8 0 4 0;");
+
+        VBox content = new VBox(6, summaryLabel, errorsLabel, errorList, editorLabel, fileEditor);
+        content.setPadding(new Insets(12));
+
+
+        Button btnSave = new Button("💾  Save & Reload");
+        Button btnClose = new Button("Close");
+        btnSave.setStyle("-fx-background-color: #4a9eff; -fx-text-fill: white;");
+
+        javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox(10, btnSave, btnClose);
+        buttons.setAlignment(Pos.CENTER_RIGHT);
+        buttons.setPadding(new Insets(10, 12, 10, 12));
+
+        VBox dialogRoot = new VBox(content, buttons);
+
+        javafx.scene.Scene dialogScene = new javafx.scene.Scene(dialogRoot, 700, 560);
+
+
+        try {
+            dialogScene.getStylesheets().add("style.css");
+        } catch (Exception ignored) {}
+
+        Stage dialog = new Stage();
+        dialog.setTitle(title);
+        dialog.setScene(dialogScene);
+        dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+        btnClose.setOnAction(e -> dialog.close());
+
+        btnSave.setOnAction(e -> {
+
+            try {
+                PrintWriter writer = new PrintWriter(new FileWriter(filePath));
+                writer.print(fileEditor.getText());
+                writer.close();
+                dialog.close();
+
+
+                if (filePath.contains("book")) {
+                    books = loadBooks();
+                    bookTable.getItems().setAll(books);
+                    showView(bookTable);
+                    outputTitleLabel.setText("BOOKS  ·  " + books.size() + " records loaded");
+                } else if (filePath.contains("student")) {
+                    students = loadStudents();
+                    studentTable.getItems().setAll(students);
+                    showView(studentTable);
+                    outputTitleLabel.setText("STUDENTS  ·  " + students.size() + " records loaded");
+                } else if (filePath.contains("transaction")) {
+                    transactions = loadTransactions();
+                    transactionTable.getItems().setAll(transactions);
+                    showView(transactionTable);
+                    outputTitleLabel.setText("TRANSACTIONS  ·  " + transactions.size() + " records loaded");
+                }
+                updateStats();
+
+            } catch (Exception ex) {
+                messageArea.setText("Error saving file.\n" + ex.getMessage());
+                showView(messageArea);
+                outputTitleLabel.setText("SAVE ERROR");
+                dialog.close();
+            }
+        });
+
+        dialog.show();
     }
 }
